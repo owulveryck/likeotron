@@ -47,16 +47,16 @@ func main() {
 	config.PrivateKey = "ssl/server.key"
 	config.Certificate = "ssl/server.pem"
 	defaultConf := config
-	err := envconfig.Process("WEB", &config)
+	err := envconfig.Process("LIKEOTRON", &config)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	log.Printf("==> WEB_PORT: %v (default: %v)", config.Port, defaultConf.Port)
-	log.Printf("==> WEB_SCHEME: %v (default: %v)", config.Scheme, defaultConf.Scheme)
-	log.Printf("==> WEB_ADDRESS: %v (default: %v)", config.Address, defaultConf.Address)
-	log.Printf("==> WEB_DEBUG: %v (default: %v)", config.Debug, defaultConf.Debug)
-	log.Printf("==> WEB_PRIVATEKEY: %v (default: %v)", config.PrivateKey, defaultConf.PrivateKey)
-	log.Printf("==> WEB_CERTIFICATE: %v (default: %v)", config.Certificate, defaultConf.Certificate)
+	log.Printf("==> LIKEOTRON_PORT: %v (default: %v)", config.Port, defaultConf.Port)
+	log.Printf("==> LIKEOTRON_SCHEME: %v (default: %v)", config.Scheme, defaultConf.Scheme)
+	log.Printf("==> LIKEOTRON_ADDRESS: %v (default: %v)", config.Address, defaultConf.Address)
+	log.Printf("==> LIKEOTRON_DEBUG: %v (default: %v)", config.Debug, defaultConf.Debug)
+	log.Printf("==> LIKEOTRON_PRIVATEKEY: %v (default: %v)", config.PrivateKey, defaultConf.PrivateKey)
+	log.Printf("==> LIKEOTRON_CERTIFICATE: %v (default: %v)", config.Certificate, defaultConf.Certificate)
 	if *help {
 		os.Exit(0)
 	}

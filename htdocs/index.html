@@ -38,16 +38,21 @@
     <section>
 
       <!--body-->
+      <form class="form-inline">
+        <div class="form-group">
+            <label class="sr-only" for="exampleInputAmount">Hashtag</label>
+            <div class="input-group">
+                <div class="input-group-addon">#</div>
+                <input type="text" class="form-control" id="exampleInputAmount" placeholder="hashtag">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">go!</button>
+    </form>
+      <button type="button" class="btn btn-success btn-lg" onclick="senddata(true)">Like</button>
+      <button type="button" class="btn btn-danger btn-lg" onclick="senddata(false)">Don't like</button>
         <div class="col-lg-10 col-md-offset-1">
-            <div class="form-group">
-                <label for="input-search" class="sr-only">Search Tree:</label>
-                <input type="input" class="form-control" id="input-search" placeholder="Type to search..." value="">
-            </div>
         </div>
             <div class="row">
-            <div id="tree" class="col-lg-3 col-md-offset-1"> </div>
-                <input id="sendtext" type="text" />
-                <input type="button" id="sendBtn" value="send" onclick="senddata()"></input>
                 <div id="output" class="well col-lg-7">
 
                 </div>
@@ -61,26 +66,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bootstrap-treeview.min.js"></script>
-    <script type="text/javascript" src="js/underscore-min.js"></script>
     <script type="text/javascript" src="js/json2.js"></script>
-    <script type="text/javascript" src="js/showdown.min.js"></script>
-    <script type="text/template" id="tpl-html">
-    This is an auto-generate page
-        <% if (target.name != "") { %> 
-        <h2><%=target.name%></h2>
-        <%};%>
-
-        <h3>Description</h3>
-        <% if (target.description != "") { %> 
-            <%=displayMarkdown(target.description)%>
-        <%};%>
-        <h3>full text goes here</h3>
-        <% if (target.full_text != "") { %> 
-            <%=displayMarkdown(target.full_text)%>
-        <%};%>
-
-    </script>
-    <script type="text/javascript" src="js/myscript.js"></script>
     <script type="text/javascript" src="js/websocket.js"></script>
   </body>
 </html>
