@@ -22,7 +22,7 @@
 
 }
 .progress:before {
-    content: attr(data-amount)"% Complete";
+    content: attr(data-amount)"% liked";
     position: absolute;
     top: 0;
     left: 0;

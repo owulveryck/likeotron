@@ -21,12 +21,25 @@ import (
 	"time"
 )
 
+type Result struct {
+	Topic string    `json:"topic"`
+	Date  time.Time `json:"date"`
+	Total int64     `json:"total"`
+	Score float64   `json:"score"`
+}
+
 type Message struct {
 	Topic  string    `json:"topic"`
 	Sender string    `json:"sender"`
 	Msg    string    `json:"message"`
 	Like   bool      `json:"like"`
 	Date   time.Time `json:"-"`
+}
+
+var topics map[string][]int64
+
+func init() {
+	topics = make(map[string][]int64, 0)
 }
 
 func echoHandler(ws *websocket.Conn) {
@@ -37,10 +50,35 @@ func echoHandler(ws *websocket.Conn) {
 		err := websocket.JSON.Receive(ws, &message)
 		if err != nil {
 			log.Println("Unable to read message", err)
+			return
+		} else {
+			log.Println(message)
 		}
 
-		message.Sender = "Server"
-		err = websocket.JSON.Send(ws, message)
+		var increment int64
+		if message.Like {
+			increment = 1
+		} else {
+			increment = -1
+		}
+		if _, ok := topics[message.Topic]; !ok {
+			topics[message.Topic] = []int64{
+				1,
+				1,
+			}
+		}
+		topics[message.Topic] = []int64{
+			topics[message.Topic][0] + 1,
+			topics[message.Topic][1] + increment,
+		}
+		var response Result
+		response.Topic = message.Topic
+		response.Date = time.Now()
+		response.Total = topics[message.Topic][0]
+		response.Score = float64(topics[message.Topic][1] * 100 / topics[message.Topic][0])
+		log.Println("about to send ", response)
+
+		err = websocket.JSON.Send(ws, response)
 		if err != nil {
 			log.Println("Unable to send message", err)
 		}
