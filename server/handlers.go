@@ -59,9 +59,8 @@ func progress(w http.ResponseWriter, r *http.Request) {
 		err := websocket.ReadJSON(c, &message)
 		if err != nil {
 			log.Println("Unable to read message", err)
-			break
 		} else {
-			log.Println(message)
+			log.Printf("=> Message: \n==> Topic:%v\n==>Sender:%v\n==>Date:%v ", message.Topic, message.Sender, message.Date)
 		}
 
 		var increment int64

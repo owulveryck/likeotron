@@ -14,7 +14,8 @@ ws.onopen = function() {
 
 // Write message on receive
 ws.onmessage = function(e) {
-    document.getElementById('output').innerHTML += "Received: " + e.data + "<br>";
+    console.log("Received:",e);
+    //document.getElementById('output').innerHTML += "Received: " + e.data + "<br>";
     var obj = JSON.parse(e.data);
     dataval = obj.score;
     $('.progress .amount').css("width", 100 - dataval + "%");
@@ -30,5 +31,6 @@ function senddata(like) {
     };
      
     ws.send(JSON.stringify(msg));
-    document.getElementById('output').innerHTML += "Sent: " + JSON.stringify(msg) + "<br>";
+    console.log("Sending:",msg);
+    //document.getElementById('output').innerHTML += "Sent: " + JSON.stringify(msg) + "<br>";
 }
