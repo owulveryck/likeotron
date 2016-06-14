@@ -47,18 +47,29 @@ func NewRouter() *mux.Router {
 		Name("Static").
 		Handler(http.FileServer(http.Dir("./htdocs")))
 	go func() {
-		var attendee = make(map[string]chan Msg)
+		type tempo struct {
+			Channel chan Msg
+			State   string
+		}
+		var attendee = make(map[string]tempo)
 		for {
 			message := <-communication
 			log.Println("Message received ", message)
-			if _, ok := attendee[message.Msg.Name]; !ok {
-				attendee[message.Msg.Name] = message.Chan
-			}
-			for att, channel := range attendee {
-				go func(att string, channel chan Msg) {
-					log.Printf("Sending to %v on channel %v", att, channel)
-					channel <- Msg{"A", "autonomous"}
-				}(att, channel)
+			attendee[message.Msg.Name] = tempo{Channel: message.Chan, State: message.Msg.State}
+			for att, temp := range attendee {
+				go func(att string, temp tempo) {
+					channel := temp.Channel
+					state := temp.State
+					log.Println(state)
+					if state == "start" {
+						log.Printf("Sending to %v on channel %v", att, channel)
+						channel <- Msg{"A", "running"}
+					}
+					if state == "stop" {
+						log.Printf("Sending to %v on channel %v", att, channel)
+						channel <- Msg{"A", "stopped"}
+					}
+				}(att, temp)
 			}
 		}
 	}()

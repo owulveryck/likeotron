@@ -117,6 +117,20 @@
             } 
             senddata(state);
         }
+        function readDeviceOrientation() {
+                            
+            if (Math.abs(window.orientation) === 90) {
+                // Landscape
+                senddata("stop"); 
+            } else {
+                // Portrait
+                senddata("start"); 
+                    
+            }
+
+        }
+
+        window.onorientationchange = readDeviceOrientation;
         function senddata(state) {
             // Construct a msg object containing the data the server needs to process the message from the chat client.
             if (ws != null) {
