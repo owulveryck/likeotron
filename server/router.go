@@ -57,7 +57,7 @@ func NewRouter() *mux.Router {
 			for att, channel := range attendee {
 				go func(att string, channel chan Msg) {
 					log.Printf("Sending to %v on channel %v", att, channel)
-					channel <- Msg{"A", "running"}
+					channel <- Msg{"A", "autonomous"}
 				}(att, channel)
 			}
 		}
