@@ -31,6 +31,11 @@ func NewRouter() *mux.Router {
 
 	router.
 		Methods("GET").
+		Path("/phone").
+		Name("WebSocket").
+		HandlerFunc(phone)
+	router.
+		Methods("GET").
 		Path("/progress").
 		Name("WebSocket").
 		HandlerFunc(progress)

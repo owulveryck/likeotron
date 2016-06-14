@@ -43,6 +43,51 @@ func init() {
 }
 
 var upgrader = websocket.Upgrader{} // use default options
+func phone(w http.ResponseWriter, r *http.Request) {
+	type receiver struct {
+		Name  string `json:"name"`
+		State string `json:"state"`
+	}
+	type sender struct {
+		State string `json:"state"`
+	}
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade:", err)
+		return
+
+	}
+	defer c.Close()
+
+	for {
+
+		var message receiver
+		err := websocket.ReadJSON(c, &message)
+		if err != nil {
+			log.Println("Unable to read message", err)
+		} else {
+			log.Printf("=> %v is connected", message.Name)
+		}
+
+		var response sender
+		switch message.State {
+		case "initial":
+			response.State = "connected"
+		case "start":
+			response.State = "running"
+		case "stop":
+			response.State = "stopped"
+		default:
+			response.State = "connected"
+		}
+		log.Println("about to send ", response)
+
+		err = websocket.WriteJSON(c, response)
+		if err != nil {
+			log.Println("Unable to send message", err)
+		}
+	}
+}
 
 func progress(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
