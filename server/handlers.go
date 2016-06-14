@@ -36,6 +36,11 @@ type Message struct {
 	Date   time.Time `json:"-"`
 }
 
+type Msg struct {
+	Name  string `json:"name"`
+	State string `json:"state"`
+}
+
 var topics map[string][]int64
 
 func init() {
@@ -43,6 +48,8 @@ func init() {
 }
 
 var upgrader = websocket.Upgrader{} // use default options
+
+var communication = make(chan Msg)
 
 func phone(w http.ResponseWriter, r *http.Request) {
 	type receiver struct {
@@ -62,12 +69,13 @@ func phone(w http.ResponseWriter, r *http.Request) {
 
 	for {
 
-		var message receiver
+		var message Msg
 		err := websocket.ReadJSON(c, &message)
 		if err != nil {
 			log.Println("Unable to read message", err)
 		} else {
 			log.Printf("=> %v is connected", message.Name)
+			communication <- message
 		}
 
 		var response sender
