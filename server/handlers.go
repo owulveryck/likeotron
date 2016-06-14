@@ -43,6 +43,7 @@ func init() {
 }
 
 var upgrader = websocket.Upgrader{} // use default options
+
 func phone(w http.ResponseWriter, r *http.Request) {
 	type receiver struct {
 		Name  string `json:"name"`
