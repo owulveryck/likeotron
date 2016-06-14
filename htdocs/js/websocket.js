@@ -1,4 +1,4 @@
-var ws = new WebSocket('wss://' + window.location.host + '/echo');
+var ws = new WebSocket('wss://' + window.location.host + '/progress');
 
 
 ws.onopen = function() {

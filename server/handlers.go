@@ -15,7 +15,7 @@
 package server
 
 import (
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"time"
@@ -42,15 +42,24 @@ func init() {
 	topics = make(map[string][]int64, 0)
 }
 
-func echoHandler(ws *websocket.Conn) {
+var upgrader = websocket.Upgrader{} // use default options
+
+func progress(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade:", err)
+		return
+
+	}
+	defer c.Close()
 
 	for {
 
 		var message Message
-		err := websocket.JSON.Receive(ws, &message)
+		err := websocket.ReadJSON(c, &message)
 		if err != nil {
 			log.Println("Unable to read message", err)
-			return
+			break
 		} else {
 			log.Println(message)
 		}
@@ -78,7 +87,7 @@ func echoHandler(ws *websocket.Conn) {
 		response.Score = float64(topics[message.Topic][1] * 100 / topics[message.Topic][0])
 		log.Println("about to send ", response)
 
-		err = websocket.JSON.Send(ws, response)
+		err = websocket.WriteJSON(c, response)
 		if err != nil {
 			log.Println("Unable to send message", err)
 		}

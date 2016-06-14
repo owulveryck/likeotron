@@ -16,7 +16,6 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"golang.org/x/net/websocket"
 	"net/http"
 )
 
@@ -32,9 +31,9 @@ func NewRouter() *mux.Router {
 
 	router.
 		Methods("GET").
-		Path("/echo").
+		Path("/progress").
 		Name("WebSocket").
-		Handler(websocket.Handler(echoHandler))
+		HandlerFunc(progress)
 
 	router.
 		Methods("GET").
