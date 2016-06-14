@@ -41,6 +41,11 @@ type Msg struct {
 	State string `json:"state"`
 }
 
+type Communication struct {
+	Msg  Msg
+	Chan chan Msg
+}
+
 var topics map[string][]int64
 
 func init() {
@@ -49,16 +54,9 @@ func init() {
 
 var upgrader = websocket.Upgrader{} // use default options
 
-var communication = make(chan Msg)
+var communication = make(chan Communication)
 
 func phone(w http.ResponseWriter, r *http.Request) {
-	type receiver struct {
-		Name  string `json:"name"`
-		State string `json:"state"`
-	}
-	type sender struct {
-		State string `json:"state"`
-	}
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
@@ -67,6 +65,20 @@ func phone(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
+	// Read incoming message and pass it to the hub
+	var channel = make(chan Msg)
+	// launch a goroutine and wait
+	go func(channel chan Msg) {
+		for {
+			response := <-channel
+			log.Println("about to send ", response)
+
+			err = websocket.WriteJSON(c, response)
+			if err != nil {
+				log.Println("Unable to send message", err)
+			}
+		}
+	}(channel)
 	for {
 
 		var message Msg
@@ -74,26 +86,10 @@ func phone(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println("Unable to read message", err)
 		} else {
-			log.Printf("=> %v is connected", message.Name)
-			communication <- message
-		}
+			log.Printf("=> %v is talking", message.Name)
+			communication <- Communication{Msg: message, Chan: channel}
+			log.Printf("=> Advertized ")
 
-		var response sender
-		switch message.State {
-		case "initial":
-			response.State = "connected"
-		case "start":
-			response.State = "running"
-		case "stop":
-			response.State = "stopped"
-		default:
-			response.State = "connected"
-		}
-		log.Println("about to send ", response)
-
-		err = websocket.WriteJSON(c, response)
-		if err != nil {
-			log.Println("Unable to send message", err)
 		}
 	}
 }

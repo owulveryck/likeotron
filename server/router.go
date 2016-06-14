@@ -16,6 +16,7 @@ package server
 
 import (
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -45,6 +46,23 @@ func NewRouter() *mux.Router {
 		PathPrefix("/").
 		Name("Static").
 		Handler(http.FileServer(http.Dir("./htdocs")))
+	go func() {
+		var attendee = make(map[string]chan Msg)
+		for {
+			message := <-communication
+			log.Println("Message received ", message)
+			if _, ok := attendee[message.Msg.Name]; !ok {
+				attendee[message.Msg.Name] = message.Chan
+			}
+			for att, channel := range attendee {
+				go func(att string, channel chan Msg) {
+					log.Printf("Sending to %v on channel %v", att, channel)
+					channel <- Msg{"A", "running"}
+				}(att, channel)
+			}
+		}
+	}()
+
 	return router
 
 }
