@@ -31,8 +31,8 @@
                 </span>
             </div><!-- /input-group -->
         </div>
-            <button type="button" class="btn btn-success btn-lg btn-block" onclick="senddata('start')">Start</button>
-            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="senddata('stop')">Stop</button>
+            <button type="button" id="btn-start" class="btn btn-success btn-lg btn-block" onclick="changeRequest('start')" style="visibility:hidden">Start</button>
+            <button type="button" id="btn-stop" class="btn btn-danger btn-lg btn-block" onclick="changeRequest('stop')" style="visibility:hidden">Stop</button>
             <div id="heart" style="visibility:hidden">
                   <img class="bottom" src="img/heart.png" width="100px">
             </div>
@@ -48,6 +48,7 @@
     <script type="text/javascript" src="js/json2.js"></script>
     <script>
         var ws;
+        var state = 'initial';
         window.onload = function() {
             var btnConnect = document.getElementById("btnConnect");
             btnConnect.onclick = function () {
@@ -72,14 +73,30 @@
                     //document.getElementById('output').innerHTML += "Received: " + e.data + "<br>";
                     var obj = JSON.parse(e.data);
                     switch (obj.state) {
-                        case "connected":
+                        case "runnable":
                             document.body.style.background = 'green';
+                            state = 'runnable';
+                            break;
+                        case "notrunnable":
+                            document.body.style.background = 'red';
+                            state = 'notrunnable';
+                            break;
+                        case "connected":
+                            document.body.style.background = 'blue';
                             break;
                         case "running":
                             document.getElementById('heart').style.visibility='visible';
                             break;
                         case "stopped":
                             document.getElementById('heart').style.visibility='hidden';
+                            break;
+                        case "autonomous":
+                            document.getElementById('btn-start').style.visibility='visible';
+                            document.getElementById('btn-stop').style.visibility='visible';
+                            break;
+                        case "conducted":
+                            document.getElementById('btn-start').style.visibility='hidden';
+                            document.getElementById('btn-stop').style.visibility='hidden';
                             break;
                     };
                 };
@@ -89,18 +106,30 @@
             }
         }
 
-
+        function changeRequest(req) {
+            switch (req) {
+                case "start":
+                    if (state == "runnable") {
+                        document.getElementById('heart').style.visibility='visible';
+                    };
+                case "stop":
+                    document.getElementById('heart').style.visibility='hidden';
+            } 
+            senddata(state);
+        }
         function senddata(state) {
             // Construct a msg object containing the data the server needs to process the message from the chat client.
-            var msg = {
-                name: document.getElementById('name').value,
-                state: state,
-                date: Date.now()
-            };
+            if (ws != null) {
+                var msg = {
+                    name: document.getElementById('name').value,
+                    state: state,
+                    date: Date.now()
+                };
 
-            ws.send(JSON.stringify(msg));
-            console.log("Sending:",msg);
-            //document.getElementById('output').innerHTML += "Sent: " + JSON.stringify(msg) + "<br>";
+                ws.send(JSON.stringify(msg));
+                console.log("Sending:",msg);
+                //document.getElementById('output').innerHTML += "Sent: " + JSON.stringify(msg) + "<br>";
+            }
         }
     </script>
   </body>
