@@ -29,7 +29,7 @@ func NewRouter() *mux.Router {
 		Methods("GET").
 		Path("/json/{jsonContent}").
 		Name("Dynamic").
-		HandlerFunc(GetJson)
+		HandlerFunc(getJSON)
 
 	router.
 		Methods("GET").
