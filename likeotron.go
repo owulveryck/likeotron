@@ -24,7 +24,7 @@ import (
 	"os"
 )
 
-type Configuration struct {
+type configuration struct {
 	Debug       bool
 	Scheme      string
 	Port        int
@@ -33,7 +33,7 @@ type Configuration struct {
 	Certificate string
 }
 
-var config Configuration
+var config configuration
 
 func main() {
 
