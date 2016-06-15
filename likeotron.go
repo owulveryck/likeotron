@@ -17,11 +17,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/kelseyhightower/envconfig"
-	"github.com/owulveryck/likeotron/server"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/kelseyhightower/envconfig"
+	"github.com/owulveryck/likeotron/server"
 )
 
 type configuration struct {
