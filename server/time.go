@@ -23,6 +23,7 @@ import (
 // Let's implement the interface Marshaler and override the format
 type JSONTime time.Time
 
+// MarshalJSON method for my custom type
 func (t JSONTime) MarshalJSON() ([]byte, error) {
 	const layout = "2006-01-02T15:04:05.000Z"
 	log.Println(time.Time(t).Format(layout))

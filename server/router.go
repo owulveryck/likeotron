@@ -15,10 +15,12 @@
 package server
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
+// NewRouter is the constructor for all my routes
 func NewRouter() *mux.Router {
 
 	router := mux.NewRouter().StrictSlash(true)
