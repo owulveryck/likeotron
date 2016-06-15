@@ -21,14 +21,14 @@ import (
 	"time"
 )
 
-type Result struct {
+type result struct {
 	Topic string    `json:"topic"`
 	Date  time.Time `json:"date"`
 	Total int64     `json:"total"`
 	Score float64   `json:"score"`
 }
 
-type Message struct {
+type message struct {
 	Topic  string    `json:"topic"`
 	Sender string    `json:"sender"`
 	Msg    string    `json:"message"`
@@ -36,14 +36,14 @@ type Message struct {
 	Date   time.Time `json:"-"`
 }
 
-type Msg struct {
+type msg struct {
 	Name  string `json:"name"`
 	State string `json:"state"`
 }
 
 type Communication struct {
-	Msg  Msg
-	Chan chan Msg
+	Msg  msg
+	Chan chan msg
 }
 
 var topics map[string][]int64
@@ -65,13 +65,13 @@ func orchestrator(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	type tempo struct {
-		Channel chan Msg
+		Channel chan msg
 		State   string
 	}
 	var attendee = make(map[string]tempo)
 	for {
 		message := <-communication
-		log.Println("Message received ", message)
+		log.Println("message received ", message)
 		attendee[message.Msg.Name] = tempo{Channel: message.Chan, State: message.Msg.State}
 		for att, temp := range attendee {
 			go func(att string, temp tempo) {
@@ -80,11 +80,11 @@ func orchestrator(w http.ResponseWriter, r *http.Request) {
 				log.Println(state)
 				if state == "start" {
 					log.Printf("Sending to %v on channel %v", att, channel)
-					channel <- Msg{"A", "running"}
+					channel <- msg{"A", "running"}
 				}
 				if state == "stop" {
 					log.Printf("Sending to %v on channel %v", att, channel)
-					channel <- Msg{"A", "stopped"}
+					channel <- msg{"A", "stopped"}
 				}
 			}(att, temp)
 		}
@@ -101,9 +101,9 @@ func phone(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 
 	// Read incoming message and pass it to the hub
-	var channel = make(chan Msg)
+	var channel = make(chan msg)
 	// launch a goroutine and wait
-	go func(channel chan Msg) {
+	go func(channel chan msg) {
 		for {
 			response := <-channel
 			log.Println("about to send ", response)
@@ -116,7 +116,7 @@ func phone(w http.ResponseWriter, r *http.Request) {
 	}(channel)
 	for {
 
-		var message Msg
+		var message msg
 		err := websocket.ReadJSON(c, &message)
 		if err != nil {
 			log.Println("Unable to read message", err)
@@ -140,12 +140,12 @@ func progress(w http.ResponseWriter, r *http.Request) {
 
 	for {
 
-		var message Message
+		var message message
 		err := websocket.ReadJSON(c, &message)
 		if err != nil {
 			log.Println("Unable to read message", err)
 		} else {
-			log.Printf("=> Message: \n==> Topic:%v\n==>Sender:%v\n==>Date:%v ", message.Topic, message.Sender, message.Date)
+			log.Printf("=> message: \n==> Topic:%v\n==>Sender:%v\n==>Date:%v ", message.Topic, message.Sender, message.Date)
 		}
 
 		var increment int64
@@ -164,7 +164,7 @@ func progress(w http.ResponseWriter, r *http.Request) {
 			topics[message.Topic][0] + 1,
 			topics[message.Topic][1] + increment,
 		}
-		var response Result
+		var response result
 		response.Topic = message.Topic
 		response.Date = time.Now()
 		response.Total = topics[message.Topic][0]
