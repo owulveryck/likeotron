@@ -11,7 +11,7 @@ function myGraph() {
     var i = 0;
     var n = findNode(id);
     while (i < links.length) {
-      if ((links[i]['source'] == n) || (links[i]['target'] == n)) {
+      if ((links.i.source == n) || (links.i.target == n)) {
         links.splice(i, 1);
       }
       else i++;
@@ -47,9 +47,8 @@ function myGraph() {
 
   var findNode = function (id) {
     for (var i in nodes) {
-      if (nodes[i]["id"] === id) return nodes[i];
+      if (nodes.i.id === id) return nodes[i];
     }
-    ;
   };
 
   var findNodeIndex = function (id) {
@@ -58,7 +57,6 @@ function myGraph() {
         return i;
       }
     }
-    ;
   };
 
   // set up the D3 visualisation in the specified element
@@ -151,7 +149,7 @@ function myGraph() {
 
     // Restart the force layout.
     force
-      .gravity(.01)
+      .gravity(0.01)
       .charge(-400)
       .friction(0)
     //.linkDistance( function(d) { return d.value * 10 } )
@@ -267,5 +265,5 @@ window.onload = function() {
   ws.onclose = function() {
     document.body.style.background = 'white';
   };
-}
+};
 
