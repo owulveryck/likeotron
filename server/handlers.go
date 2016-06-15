@@ -56,6 +56,41 @@ var upgrader = websocket.Upgrader{} // use default options
 
 var communication = make(chan Communication)
 
+func orchestrator(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade:", err)
+		return
+
+	}
+	defer c.Close()
+	type tempo struct {
+		Channel chan Msg
+		State   string
+	}
+	var attendee = make(map[string]tempo)
+	for {
+		message := <-communication
+		log.Println("Message received ", message)
+		attendee[message.Msg.Name] = tempo{Channel: message.Chan, State: message.Msg.State}
+		for att, temp := range attendee {
+			go func(att string, temp tempo) {
+				channel := temp.Channel
+				state := temp.State
+				log.Println(state)
+				if state == "start" {
+					log.Printf("Sending to %v on channel %v", att, channel)
+					channel <- Msg{"A", "running"}
+				}
+				if state == "stop" {
+					log.Printf("Sending to %v on channel %v", att, channel)
+					channel <- Msg{"A", "stopped"}
+				}
+			}(att, temp)
+		}
+	}
+}
+
 func phone(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {

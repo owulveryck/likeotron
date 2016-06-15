@@ -16,7 +16,6 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 )
 
@@ -30,6 +29,11 @@ func NewRouter() *mux.Router {
 		Name("Dynamic").
 		HandlerFunc(GetJson)
 
+	router.
+		Methods("GET").
+		Path("/orchestrator").
+		Name("WebSocket").
+		HandlerFunc(orchestrator)
 	router.
 		Methods("GET").
 		Path("/phone").
@@ -46,34 +50,6 @@ func NewRouter() *mux.Router {
 		PathPrefix("/").
 		Name("Static").
 		Handler(http.FileServer(http.Dir("./htdocs")))
-	go func() {
-		type tempo struct {
-			Channel chan Msg
-			State   string
-		}
-		var attendee = make(map[string]tempo)
-		for {
-			message := <-communication
-			log.Println("Message received ", message)
-			attendee[message.Msg.Name] = tempo{Channel: message.Chan, State: message.Msg.State}
-			for att, temp := range attendee {
-				go func(att string, temp tempo) {
-					channel := temp.Channel
-					state := temp.State
-					log.Println(state)
-					if state == "start" {
-						log.Printf("Sending to %v on channel %v", att, channel)
-						channel <- Msg{"A", "running"}
-					}
-					if state == "stop" {
-						log.Printf("Sending to %v on channel %v", att, channel)
-						channel <- Msg{"A", "stopped"}
-					}
-				}(att, temp)
-			}
-		}
-	}()
-
 	return router
 
 }
