@@ -10,7 +10,7 @@ ws.onopen = function() {
     };
      
     ws.send(JSON.stringify(msg));
-}
+};
 
 // Write message on receive
 ws.onmessage = function(e) {
